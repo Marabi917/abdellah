@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إذاعة القرآن الكريم من القاهرة</title>
+    <!-- استيراد خط تجوال العربي -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- استيراد مكتبة Tailwind CSS للتصميم -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- استيراد مكتبة FontAwesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- إعدادات Tailwind لتخصيص الألوان والخطوط -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            400: '#FCD34D',
+                            500: '#F59E0B',
+                            600: '#D97706',
+                        },
+                        islamic: {
+                            light: '#0D9488', // Teal 500
+                            DEFAULT: '#0F766E', // Teal 600
+                            dark: '#115E59',  // Teal 700
+                            deep: '#134E4A',  // Teal 800
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            /* خلفية متدرجة تدمج بين الأسود والرمادي الداكن لجو مهيب ومريح */
+            background: linear-gradient(135deg, #111827 0%, #030712 50%, #000000 100%);
+            min-height: 100vh;
+            color: #f3f4f6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* نقوش إسلامية في الخلفية بشفافية منخفضة */
+        .pattern-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="%23FFFFFF" fill-opacity="0.02" d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.3,-46.3C90.8,-33.5,96.9,-18,97.7,-2.4C98.4,13.2,93.8,29,84.1,41.9C74.4,54.8,59.6,64.8,44.1,72.4C28.6,80,12.4,85.2,-3.5,89.5C-19.4,93.8,-34.7,97.2,-48.5,91.8C-62.3,86.4,-74.6,72.2,-83.4,56.5C-92.2,40.8,-97.5,23.6,-98.5,6.5C-99.5,-10.6,-96.2,-27.6,-88.3,-42.6C-80.4,-57.6,-67.9,-70.6,-53.4,-78.2C-38.9,-85.8,-22.4,-88,-6.4,-76.7C9.6,-65.4,26.1,-40.6,44.7,-76.4Z" transform="translate(100 100)" /></svg>');
+            background-size: 400px;
+            background-repeat: repeat;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        /* تأثير التوهج للزر عند التشغيل */
+        .playing-glow {
+            box-shadow: 0 0 20px rgba(252, 211, 77, 0.6), inset 0 0 10px rgba(252, 211, 77, 0.4);
+        }
+
+        /* مؤشر الترددات (Visualizer وهمي بسيط) */
+        .bar {
+            width: 4px;
+            background-color: #FCD34D;
+            border-radius: 4px;
+            transition: height 0.1s ease;
+            opacity: 0.5;
+        }
+        
+        .is-playing .bar {
+            opacity: 1;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            0% { height: 10px; }
+            100% { height: 40px; }
+        }
+
+        /* تأخير حركات المؤشر */
+        .bar:nth-child(1) { animation-delay: 0.1s; }
+        .bar:nth-child(2) { animation-delay: 0.4s; }
+        .bar:nth-child(3) { animation-delay: 0.2s; }
+        .bar:nth-child(4) { animation-delay: 0.6s; }
+        .bar:nth-child(5) { animation-delay: 0.3s; }
+        .bar:nth-child(6) { animation-delay: 0.7s; }
+        .bar:nth-child(7) { animation-delay: 0.2s; }
+    </style>
+</head>
+<body class="antialiased flex flex-col items-center justify-center">
+
+    <div class="pattern-overlay"></div>
+
+    <main class="relative z-10 w-full max-w-2xl px-4 py-12 md:py-20 flex flex-col items-center">
+        
+        <!-- عنوان الإهداء -->
+        <header class="text-center mb-12 w-full">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-amber-200 mb-4 drop-shadow-lg leading-relaxed">
+                إذاعة القرآن الكريم من القاهرة
+            </h1>
+            <div class="flex items-center justify-center space-x-4 space-x-reverse mb-6">
+                <span class="h-px bg-gradient-to-r from-transparent via-gold-500 to-transparent w-16"></span>
+                <i class="fas fa-star-and-crescent text-gold-400 text-sm"></i>
+                <span class="h-px bg-gradient-to-r from-transparent via-gold-500 to-transparent w-16"></span>
+            </div>
+            <div class="inline-block glass-panel px-6 py-3 rounded-full">
+                <p class="text-lg md:text-xl font-medium text-gray-100 tracking-wide">
+                    صدقة جارية على روح المرحوم <span class="text-gold-400 font-bold">عبداللاه</span>
+                </p>
+                <p class="text-sm text-gray-400 mt-1">نسألكم الدعاء له بالرحمة والمغفرة</p>
+            </div>
+        </header>
+
+        <!-- واجهة المشغل -->
+        <div class="glass-panel w-full rounded-3xl p-8 md:p-12 flex flex-col items-center relative overflow-hidden">
+            
+            <!-- دائرة زخرفية خلف الزر -->
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-gray-600/30 rounded-full animate-pulse-slow"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-gray-700/30 rounded-full animate-spin-slow border-dashed"></div>
+
+            <!-- معلومات المحطة -->
+            <div class="text-center mb-10 z-10">
+                <div class="w-24 h-24 mx-auto bg-black rounded-full flex items-center justify-center mb-6 shadow-xl border-2 border-gold-500/50">
+                    <i class="fas fa-quran text-4xl text-gold-400"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">البث المباشر</h2>
+                <p class="text-gray-300 flex items-center justify-center gap-2" id="status-text">
+                    <span class="w-2 h-2 rounded-full bg-red-500 inline-block animate-pulse"></span>
+                    جاهز للتشغيل
+                </p>
+            </div>
+
+            <!-- مؤثر بصري للصوت (Visualizer) -->
+            <div class="flex items-end justify-center h-12 gap-2 mb-10 z-10 w-full" id="visualizer">
+                <div class="bar h-2"></div>
+                <div class="bar h-4"></div>
+                <div class="bar h-3"></div>
+                <div class="bar h-5"></div>
+                <div class="bar h-3"></div>
+                <div class="bar h-4"></div>
+                <div class="bar h-2"></div>
+            </div>
+
+            <!-- أزرار التحكم -->
+            <div class="flex items-center justify-center gap-8 z-10">
+                <!-- زر التحكم بالصوت -->
+                <button id="mute-btn" class="text-gray-300 hover:text-gold-400 transition-colors w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-800/50" title="كتم/تشغيل الصوت">
+                    <i class="fas fa-volume-up text-xl"></i>
+                </button>
+
+                <!-- زر التشغيل والإيقاف الرئيسي -->
+                <button id="play-pause-btn" class="w-20 h-20 bg-gradient-to-br from-gold-400 to-amber-600 rounded-full flex items-center justify-center text-black shadow-lg hover:shadow-gold-500/50 transition-all transform hover:scale-105 active:scale-95 text-3xl">
+                    <i class="fas fa-play ml-1" id="play-icon"></i>
+                </button>
+
+                <!-- شريط تمرير مستوى الصوت -->
+                <div class="hidden md:flex items-center gap-3 w-32">
+                    <i class="fas fa-volume-down text-gray-400 text-sm"></i>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8" 
+                        class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gold-500">
+                </div>
+                
+                <!-- زر الصوت للموبايل (بديل للشريط) -->
+                <button class="md:hidden text-gray-300 hover:text-gold-400 transition-colors w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-800/50">
+                    <i class="fas fa-info-circle text-xl" onclick="alert('استخدم أزرار الصوت في هاتفك للتحكم بالمستوى')"></i>
+                </button>
+            </div>
+            
+            <!-- رسالة خطأ (مخفية افتراضياً) -->
+            <div id="error-message" class="hidden mt-6 text-red-400 text-sm text-center px-4 py-2 bg-red-900/30 rounded-lg border border-red-800/50">
+                عذراً، حدث خطأ أثناء محاولة الاتصال بالبث. يرجى المحاولة مرة أخرى لاحقاً.
+            </div>
+
+            <!-- عنصر الصوت الفعلي -->
+            <audio id="radio-player" preload="none"></audio>
+        </div>
+
+        <!-- تذييل الصفحة -->
+        <footer class="mt-12 text-center text-gray-400 text-sm">
+            <p>وَإِذَا قُرِئَ الْقُرْآنُ فَاسْتَمِعُوا لَهُ وَأَنصِتُوا لَعَلَّكُمْ تُرْحَمُونَ</p>
+            <p class="mt-2 text-xs opacity-75">صَدَقَ اللهُ العَظِيم</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const player = document.getElementById('radio-player');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const playIcon = document.getElementById('play-icon');
+            const muteBtn = document.getElementById('mute-btn');
+            const volumeSlider = document.getElementById('volume-slider');
+            const statusText = document.getElementById('status-text');
+            const visualizer = document.getElementById('visualizer');
+            const errorMessage = document.getElementById('error-message');
+
+            const streamUrl = "https://n13.radiojar.com/8s5u5tpdtwzuv?rj-ttl=5&rj-tok=AAABk6shqpUAmERj_dQaKuFSRw";
+
+            let isPlaying = false;
+            let isMuted = false;
+            let currentVolume = 0.8;
+            let isLoading = false; // لمنع النقر المزدوج المتسبب في تداخل الصوت
+
+            // تعيين مستوى الصوت الافتراضي
+            player.volume = currentVolume;
+
+            // تفريغ الرابط عند الإيقاف لمنع تداخل الأصوات (الإيقاف التام للبث المباشر)
+            function stopAndClearAudio() {
+                player.pause();
+                player.removeAttribute('src');
+                player.load();
+            }
+
+            // دالة تغيير حالة التشغيل
+            function togglePlay() {
+                if (isLoading) return; // منع التداخل إذا كان قيد التحميل
+
+                errorMessage.classList.add('hidden');
+                
+                if (isPlaying) {
+                    stopAndClearAudio();
+                    setPausedState();
+                } else {
+                    isLoading = true;
+                    statusText.innerHTML = '<i class="fas fa-spinner fa-spin text-gold-400 mr-2"></i> جاري الاتصال...';
+                    
+                    // تعيين مصدر الصوت من جديد لضمان عدم وجود نسخة مخزنة مؤقتاً
+                    player.src = streamUrl;
+                    player.load();
+                    
+                    // محاولة التشغيل
+                    const playPromise = player.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(_ => {
+                            setPlayingState();
+                            isLoading = false;
+                        })
+                        .catch(error => {
+                            console.error("خطأ في تشغيل البث:", error);
+                            stopAndClearAudio();
+                            setPausedState();
+                            statusText.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span> خطأ في الاتصال';
+                            errorMessage.classList.remove('hidden');
+                            isLoading = false;
+                        });
+                    }
+                }
+            }
+
+            // تحديث الواجهة لحالة التشغيل
+            function setPlayingState() {
+                isPlaying = true;
+                playIcon.classList.remove('fa-play', 'ml-1');
+                playIcon.classList.add('fa-stop');
+                playPauseBtn.classList.add('playing-glow');
+                visualizer.classList.add('is-playing');
+                statusText.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-400 inline-block animate-pulse shadow-[0_0_8px_#4ade80]"></span> متصل - البث يعمل';
+            }
+
+            // تحديث الواجهة لحالة الإيقاف
+            function setPausedState() {
+                isPlaying = false;
+                playIcon.classList.remove('fa-stop');
+                playIcon.classList.add('fa-play', 'ml-1');
+                playPauseBtn.classList.remove('playing-glow');
+                visualizer.classList.remove('is-playing');
+                statusText.innerHTML = '<span class="w-2 h-2 rounded-full bg-gray-400 inline-block"></span> متوقف';
+            }
+
+            // التحكم في كتم الصوت
+            function toggleMute() {
+                isMuted = !isMuted;
+                player.muted = isMuted;
+                
+                const muteIcon = muteBtn.querySelector('i');
+                if (isMuted) {
+                    muteIcon.classList.remove('fa-volume-up');
+                    muteIcon.classList.add('fa-volume-mute', 'text-red-400');
+                    volumeSlider.value = 0;
+                } else {
+                    muteIcon.classList.remove('fa-volume-mute', 'text-red-400');
+                    muteIcon.classList.add('fa-volume-up');
+                    volumeSlider.value = currentVolume;
+                }
+            }
+
+            // التحكم بمستوى الصوت عبر الشريط
+            function changeVolume(e) {
+                const vol = parseFloat(e.target.value);
+                player.volume = vol;
+                currentVolume = vol;
+                
+                // إلغاء الكتم تلقائياً إذا تم رفع الصوت
+                if (vol > 0 && isMuted) {
+                    toggleMute();
+                } else if (vol === 0 && !isMuted) {
+                    toggleMute();
+                }
+            }
+
+            // إضافة مستمعي الأحداث
+            playPauseBtn.addEventListener('click', togglePlay);
+            muteBtn.addEventListener('click', toggleMute);
+            volumeSlider.addEventListener('input', changeVolume);
+
+            // إيقاف الصوت تماماً عند تحديث الصفحة أو مغادرتها (لمنع تداخل الأصوات في الخلفية)
+            window.addEventListener('beforeunload', () => {
+                stopAndClearAudio();
+            });
+
+            // معالجة توقف البث من المصدر (مثلاً انقطاع الإنترنت)
+            player.addEventListener('waiting', () => {
+                if(isPlaying) {
+                    statusText.innerHTML = '<i class="fas fa-spinner fa-spin text-gold-400 mr-2"></i> جاري التحميل...';
+                    visualizer.classList.remove('is-playing');
+                }
+            });
+
+            player.addEventListener('playing', () => {
+                if(isPlaying) {
+                    setPlayingState();
+                }
+            });
+
+            player.addEventListener('error', (e) => {
+                console.error("حدث خطأ في مصدر الصوت", e);
+                stopAndClearAudio();
+                setPausedState();
+                statusText.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span> انقطع الاتصال';
+                errorMessage.classList.remove('hidden');
+                isLoading = false;
+            });
+        });
+    </script>
+</body>
+</html>
